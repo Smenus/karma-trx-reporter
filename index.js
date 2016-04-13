@@ -3,18 +3,17 @@ var fs = require('fs');
 var builder = require('xmlbuilder');
 
 var TRXReporter = function (baseReporterDecorator, config, emitter, logger, helper, formatError) {
-    var outputFile = config.outputFile;
-    var shortTestName = !!config.shortTestName;
-    var log = logger.create('reporter.trx');
-    var hostName = require('os').hostname();
-    var testRun;
-    var resultSummary;
-    var counters;
-    var testDefinitions;
-    var testListIdNotInAList;
-    var testEntries;
-    var results;
-    var times;
+    var outputFile = config.outputFile,
+        log = logger.create('reporter.trx'),
+        hostName = require('os').hostname(),
+        testRun,
+        resultSummary,
+        counters,
+        testDefinitions,
+        testListIdNotInAList,
+        testEntries,
+        results,
+        times;
 
     var getTimestamp = function () {
         // todo: use local time ?
@@ -53,8 +52,8 @@ var TRXReporter = function (baseReporterDecorator, config, emitter, logger, help
     baseReporterDecorator(this);
 
     this.onRunStart = function () {
-        var userName = process.env['USERNAME'];
-        var runStartTimestamp = getTimestamp();
+        var userName = process.env['USERNAME'],
+            runStartTimestamp = getTimestamp();
         testRun = builder.create("TestRun", {version: '1.0', encoding: 'UTF-8'})
             .att('id', newGuid())
             .att('name', userName + '@' + hostName + ' ' + runStartTimestamp)
@@ -127,12 +126,10 @@ var TRXReporter = function (baseReporterDecorator, config, emitter, logger, help
     };
 
     this.specSuccess = this.specSkipped = this.specFailure = function (browser, result) {
-        var unitTestId = newGuid();
-        var unitTestName = shortTestName
-            ? result.description
-            : browser.name + '_' + result.description;
-        var className = result.suite.join('.');
-        var codeBase = className + '.' + unitTestName;
+        var unitTestId = newGuid(),
+            unitTestName = result.suite.join(' ') + ' ' + result.description,
+            className = result.suite[0],
+            codeBase = browser.name + '_' + result.suite.join('.') + '.' + result.description;
 
         var unitTest = testDefinitions.ele('UnitTest')
             .att('name', unitTestName)
